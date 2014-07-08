@@ -15,8 +15,11 @@ add_items(
 
 add_sublibrary(geoflow)
 
+include_directories(${APBS_ROOT}/include)
+
 # Enable C++11 features
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
-		OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+        OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 	add_definitions(-std=c++0x)
 endif()
