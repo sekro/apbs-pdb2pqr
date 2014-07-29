@@ -1,10 +1,10 @@
 Please see http://www.poissonboltzmann.org/apbs/release-history for the
 complete change log.
 
-# These are notes for APBS version 1.4.1-binary.
-* There is a new website at http://electrostatics.github.io/apbs-pdb2pqr/.  ***Does
-  this supersede poissonboltzmann?  My understanding is that it does not, so some
-  explanation for why the both exist may be in order here?***
+# These are notes for APBS version 1.4.1-binary-release.
+
+* This release coincides with the new web site, hosted using github
+  pages, but is still found here:  http://www.poissonboltzmann.org/
 * Git source repository has been moved from SourceForge to GitHub:
   (https://github.com/Electrostatics/apbs-pdb2pqr).  The binary releases are
   still to be found at SourceForge.
@@ -14,7 +14,6 @@ complete change log.
       a bit on the high side. We suspect that there is a bug in the code, and
       plan of resolving the issue in a future release.  The full array of
       algorithm options will be surfaced in a future release as well.
-    - ***We should perhaps say something about geoflow, and why it's so awesome?***
 * A multitude of bugs related to crossing the 32-bit to 64-bit boundary have
   been terminated and excised from a plethora of programs in the APBS tool
   suite, as well as APBS proper.
@@ -22,10 +21,4 @@ complete change log.
   Frank Marcoline.
 * Finite element method support has been re-enabled for Linux and OS X platforms
   via the Finite Element ToolKit (http://www.fetk.org).
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* I can't really think of anything else to add to this paltry list.  For the
-  next release, I plan on maintaining this as a living document so that nothing
-  is left on the tiles.
-
 
