@@ -9,7 +9,7 @@
 #Sets the install location of pdb2pqr.
 #This defaults to ~/pdb2pqr
 
-#PREFIX="~/pdb2pqr"
+PREFIX="~/pdb2pqr_propka31"
 
 
 #Website URL
