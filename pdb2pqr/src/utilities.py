@@ -54,6 +54,8 @@ import os
 from os.path import splitext 
 import sys
 from aconf import INSTALLDIR, TMPDIR
+#SKRO: for propka31 parameter file:
+import pkg_resources
 
 def startLogFile(jobName, fileName, logInput):
     with open('%s%s%s/%s' % (INSTALLDIR, TMPDIR, jobName, fileName), 'w') as f:
@@ -116,6 +118,7 @@ def createPropkaOptions(pH, verbose=False, reference='neutral'):
     """
     Create a propka options object for running propka.
     """
+    #SKRO: TODO: Maybe use a modified version of propka31/lib.py -> loadOptions() instead of this static approach
     #build propka options
     propkaOpts = ExtraOptions()
     propkaOpts.pH = pH
@@ -132,7 +135,12 @@ def createPropkaOptions(pH, verbose=False, reference='neutral'):
     propkaOpts.mutator_options = None
     propkaOpts.display_coupled_residues = None
     propkaOpts.print_iterations = None
-    propkaOpts.version_label = "Nov30"
+    #SKRO: modified/added for propka31
+    propkaOpts.keep_protons = None
+    propkaOpts.protonate_all = None
+    propkaOpts.version_label = "Jan15"
+    #SKRO: TODO: Do not know if relative path always works - not windows compatible
+    propkaOpts.parameters = pkg_resources.resource_filename(__name__, "../propka31/propka.cfg")
     
     #These adds a few bits to propkaOpts 
     from propka30.Source import lib

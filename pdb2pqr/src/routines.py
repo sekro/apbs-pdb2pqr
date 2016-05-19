@@ -1479,7 +1479,7 @@ class Routines:
         for residue in self.protein.getResidues():
             residue.setDonorsAndAcceptors()
 
-    def runPROPKA(self, ph, ff, rootname, outname, options):
+    def runPROPKA(self, path, ph, ff, rootname, outname, options):
         """
             Run PROPKA on the current protein, setting protonation states to
             the correct values
@@ -1490,12 +1490,16 @@ class Routines:
                outname: The name of the PQR outfile
         """
         self.write("Running propka and applying at pH %.2f... " % ph)
-
-        from propka30.Source.protein import Protein as pkaProtein
-        from propka30.Source.pdb import readPDB as pkaReadPDB
-        from propka30.Source.lib import residueList, setVerbose
-        
-        setVerbose(options.verbose)
+	
+	#SKRO: mod to work with propka31
+	#original import lines:
+        #from propka30.Source.protein import Protein as pkaProtein
+        #from propka30.Source.pdb import readPDB as pkaReadPDB
+        #from propka30.Source.lib import residueList, setVerbose
+        #new import lines:
+	from propka31.molecular_container import Molecular_container as pkaMolecule
+    
+	#TODO: setVerbose(options.verbose)
 
         # Initialize some variables
 
@@ -1503,50 +1507,73 @@ class Routines:
         txt = ""
         pkadic = {}
         warnings = []
+	#SKRO: conformation string for result output propka31
+	conformation = 'AVR'
 
         # Reorder the atoms in each residue to start with N
 
         for residue in self.protein.getResidues():
             residue.reorder()
 
-        # Make a string with all non-hydrogen atoms
-
-        HFreeProteinFile = StringIO()
-
-        for atom in self.protein.getAtoms():
-            if not atom.isHydrogen():
-                atomtxt = atom.getPDBString()
-                atomtxt = atomtxt[:linelen]
-                HFreeProteinFile.write(atomtxt)
-                HFreeProteinFile.write('\n')
-
-
-        HFreeProteinFile.seek(0)
+	#SKRO: Not nescessary? let that do propka31        
+	# Make a string with all non-hydrogen atoms
+	#
+        #HFreeProteinFile = StringIO()
+	#
+        #for atom in self.protein.getAtoms():
+        #    if not atom.isHydrogen():
+        #        atomtxt = atom.getPDBString()
+        #        atomtxt = atomtxt[:linelen]
+        #        HFreeProteinFile.write(atomtxt)
+        #        HFreeProteinFile.write('\n')
+	#
+	#
+        #HFreeProteinFile.seek(0)
+	#
 
         # Run PropKa
 
-        atoms = pkaReadPDB('', file=HFreeProteinFile)
+        #atoms = pkaReadPDB('', file=HFreeProteinFile)
 
-        # creating protein object
-        myPkaProtein = pkaProtein(atoms=atoms, name=rootname, options=options)
+        # creating molecular/protein object
+        myPkaMolecule = pkaMolecule(input_file=path, options=options)
         # calculating pKa values for ionizable residues
-        myPkaProtein.calculatePKA(options=options)
+        myPkaMolecule.calculate_pka()
         # printing pka file
-        myPkaProtein.writePKA(options=options, filename=outname)
+        myPkaMolecule.write_pka(filename=outname, options=options)
 
-        # Parse the results
-        # This is the method used to generate the summary in the first place.
-        residue_list = residueList("propka1")
-        for chain in myPkaProtein.chains:
-            for residue_type in residue_list:
-                for residue in chain.residues:
-                    if residue.resName == residue_type:
-                        #String out the extra space after C- or N+ 
-                        key = string.strip('%s %s %s' % (string.strip(residue.resName),
-                                                        residue.resNumb, residue.chainID))
-                        pkadic[key] = residue.pKa_pro
-
-        if len(pkadic) == 0:
+	#SKRO: propka30 parsing        
+	## Parse the results
+        ## This is the method used to generate the summary in the first place.
+        #residue_list = residueList("propka1")
+        #for chain in myPkaProtein.chains:
+        #    for residue_type in residue_list:
+        #        for residue in chain.residues:
+        #            if residue.resName == residue_type:
+        #                #String out the extra space after C- or N+ 
+        #                key = string.strip('%s %s %s' % (string.strip(residue.resName),
+        #                                                residue.resNumb, residue.chainID))
+        #                pkadic[key] = residue.pKa_pro
+	#
+	
+	#SKRO: propka31 parsing
+	residue_list = myPkaMolecule.version.parameters.write_out_order
+	#for chain in myPKaMolecule.conformations[conformation].chains:
+	for residue_type in residue_list:
+		for group in myPkaMolecule.conformations[conformation].groups:
+			if group.residue_type == residue_type:
+				#TODO: SKRO: should penalised groups be removed?
+				key = string.strip('%s %s %s' % (string.strip(group.residue_type), group.atom.resNumb, group.atom.chainID))
+				#SKRO-DEBUG:
+				#print key
+				#print group.residue_type[1]
+				#print group.atom.resName
+				#print group.atom.terminal
+				#print group.atom.name				
+				pkadic[key] = group.pka_value
+	
+	#SKRO: Nothing changed from here on TODO: ligand compatibility        
+	if len(pkadic) == 0:
             return
 
         # Now apply each pka to the appropriate residue
