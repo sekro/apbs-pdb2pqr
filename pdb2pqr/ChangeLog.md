@@ -7,6 +7,8 @@
 
 * added propka 3.1 source in folder propka31
 
+All modifications/changes done by S. Krossa
+
 # Original changelog:
 # These are notes for the current version of PDB2PQR
 
