@@ -1,3 +1,5 @@
+# Original PROPKA 3.1 Readme
+
 # PROPKA 3.1
 
 PROPKA predicts the pKa values of ionizable groups in proteins
