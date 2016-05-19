@@ -171,7 +171,9 @@ def printPQRHeader(pdblist,
     
     return header
 
-def runPDB2PQR(pdblist, ff,
+#SKRO: added path as input to pass pdb file location to propka31
+#SKRO: added ligands var for processing more than 1 ligand
+def runPDB2PQR(path, pdblist, ff,
                outname = "",
                ph = None,
                verbose = False,
@@ -182,6 +184,7 @@ def runPDB2PQR(pdblist, ff,
                neutraln = False,
                neutralc = False,
                ligand = None,
+               ligands = None,
                assign_only = False,
                chain = False,
                debump = True,
@@ -196,6 +199,7 @@ def runPDB2PQR(pdblist, ff,
         Run the PDB2PQR Suite
 
         Arguments:
+	    path:    input file name incl complete pathS
             pdblist: The list of objects that was read from the PDB file
                      given as input (list)
             ff:      The name of the forcefield (string)
@@ -212,6 +216,7 @@ def runPDB2PQR(pdblist, ff,
             neutraln:      Make the N-terminus of this protein neutral
             neutralc:      Make the C-terminus of this protein neutral
             ligand:        Calculate the parameters for the ligand in mol2 format at the given path.
+	    ligands:       Calculate the parameters for the ligands in mol2 format at the given path.
             assign_only:   Only assign charges and radii - do not add atoms, debump, or optimize.
             chain:     Keep the chain ID in the output PQR file
             debump:        When 1, debump heavy atoms (int)
@@ -258,9 +263,9 @@ def runPDB2PQR(pdblist, ff,
         print "Parsed Amino Acid definition file."   
 
     # Check for the presence of a ligand!  This code is taken from pdb2pka/pka.py
-
+    #SKRO: modded for ligands
     if not ligand is None:
-        from pdb2pka.ligandclean import ligff
+        from pdb2pka.ligandclean import ligff	
         myProtein, myDefinition, Lig = ligff.initialize(myDefinition, ligand, pdblist, verbose)        
         for atom in myProtein.getAtoms():
             if atom.type == "ATOM": 
@@ -323,8 +328,11 @@ def runPDB2PQR(pdblist, ff,
             myRoutines.debumpProtein()  
 
         if pka:
-            myRoutines.runPROPKA(ph, ff, outroot, pkaname, propkaOptions)
-
+	#SKRO: added path (pdb file) var
+	    print "DEBUG: propka31 start, path: %s" % (path)
+            myRoutines.runPROPKA(path, ph, ff, outroot, pkaname, propkaOptions)
+	
+          
         myRoutines.addHydrogens()
 
         myhydRoutines = hydrogenRoutines(myRoutines)
@@ -503,7 +511,11 @@ def mainCommand(argv):
     group.add_option('--ligand', dest='ligand',  metavar='PATH',
                       help='Calculate the parameters for the ligand in mol2 format at the given path. ' + 
                            'Pdb2pka must be compiled.')
-    
+    #SKRO: new option for more than one ligand
+    group.add_option('--ligands', action="append", dest='ligands',
+                      help='Calculate the parameters for the ligands in mol2 format at the given path. ' + 
+                           'Pdb2pka must be compiled.')
+ 
     group.add_option('--whitespace', dest='whitespace', action='store_true', default=False,
                       help='Insert whitespaces between atom name and residue name, between x and y, and between y and z.')   
     
@@ -597,6 +609,13 @@ def mainCommand(argv):
             options.ligand = open(options.ligand, 'rU')
         except IOError:
             parser.error('Unable to find ligand file %s!' % options.ligand)
+    #SKRO: ligands check files
+    if not options.ligands is None:
+        try:
+            for filename in options.ligands:
+              filename = open(filename, 'rU')
+        except IOError:
+            parser.error('Unable to find ligand file %s!' % filename)
 
     if options.neutraln and (options.ff is None or options.ff.lower() != 'parse'):
         parser.error('--neutraln option only works with PARSE forcefield!')
@@ -643,8 +662,12 @@ Please cite your use of PDB2PQR as:
     # get rid of the userff and username arguments to this function.
     # This would also do away with the redundent checks and such in 
     # the Forcefield constructor.
+    
+    #SKRO: added path to arguments passed to runPDB2PQR -> runPROPKA - no support for PDB download yet!!
+    #SKRO: added ligands var for processing more than 1 ligand
     try:
-        header, lines, missedligands = runPDB2PQR(pdblist, 
+        header, lines, missedligands = runPDB2PQR(path,
+						  pdblist, 
                                                   options.ff, 
                                                   outname = options.outname,
                                                   ph = options.pH,
@@ -656,6 +679,7 @@ Please cite your use of PDB2PQR as:
                                                   neutraln = options.neutraln,
                                                   neutralc = options.neutralc,
                                                   ligand = options.ligand,
+                                                  ligands = options.ligands,
                                                   assign_only = options.assign_only,
                                                   chain = options.chain,
                                                   debump = options.debump,
