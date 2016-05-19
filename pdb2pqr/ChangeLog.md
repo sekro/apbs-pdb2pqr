@@ -1,3 +1,13 @@
+# Modified files for propka 3.1 integration:
+
+* build_config.py
+* main.py
+* src/routines.py
+* src/utilities.py
+
+* added propka 3.1 source in folder propka31
+
+# Original changelog:
 # These are notes for the current version of PDB2PQR
 
 Please see http://www.poissonboltzmann.org/pdb2pqr/release-history for the complete release history
