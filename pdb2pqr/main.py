@@ -171,8 +171,8 @@ def printPQRHeader(pdblist,
     
     return header
 
-#SKRO: added path as input to pass pdb file location to propka31
-#SKRO: added ligands var for processing more than 1 ligand
+#SEKRO: added path as input to pass pdb file location to propka31
+#SEKRO: added ligands var for processing more than 1 ligand
 def runPDB2PQR(path, pdblist, ff,
                outname = "",
                ph = None,
@@ -263,7 +263,7 @@ def runPDB2PQR(path, pdblist, ff,
         print "Parsed Amino Acid definition file."   
 
     # Check for the presence of a ligand!  This code is taken from pdb2pka/pka.py
-    #SKRO: modded for ligands
+    #SEKRO: modded for ligands
     if not ligand is None:
         from pdb2pka.ligandclean import ligff	
         myProtein, myDefinition, Lig = ligff.initialize(myDefinition, ligand, pdblist, verbose)        
@@ -328,7 +328,7 @@ def runPDB2PQR(path, pdblist, ff,
             myRoutines.debumpProtein()  
 
         if pka:
-	#SKRO: added path (pdb file) var
+	#SEKRO: added path (pdb file) var
 	    print "DEBUG: propka31 start, path: %s" % (path)
             myRoutines.runPROPKA(path, ph, ff, outroot, pkaname, propkaOptions)
 	
@@ -511,7 +511,7 @@ def mainCommand(argv):
     group.add_option('--ligand', dest='ligand',  metavar='PATH',
                       help='Calculate the parameters for the ligand in mol2 format at the given path. ' + 
                            'Pdb2pka must be compiled.')
-    #SKRO: new option for more than one ligand
+    #SEKRO: new option for more than one ligand
     group.add_option('--ligands', action="append", dest='ligands',
                       help='Calculate the parameters for the ligands in mol2 format at the given path. ' + 
                            'Pdb2pka must be compiled.')
@@ -609,7 +609,7 @@ def mainCommand(argv):
             options.ligand = open(options.ligand, 'rU')
         except IOError:
             parser.error('Unable to find ligand file %s!' % options.ligand)
-    #SKRO: ligands check files
+    #SEKRO: ligands check files
     if not options.ligands is None:
         try:
             for filename in options.ligands:
@@ -663,8 +663,8 @@ Please cite your use of PDB2PQR as:
     # This would also do away with the redundent checks and such in 
     # the Forcefield constructor.
     
-    #SKRO: added path to arguments passed to runPDB2PQR -> runPROPKA - no support for PDB download yet!!
-    #SKRO: added ligands var for processing more than 1 ligand
+    #SEKRO: added path to arguments passed to runPDB2PQR -> runPROPKA - no support for PDB download yet!!
+    #SEKRO: added ligands var for processing more than 1 ligand
     try:
         header, lines, missedligands = runPDB2PQR(path,
 						  pdblist, 
